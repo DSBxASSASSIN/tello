@@ -1,10 +1,3 @@
-#
-# Tello Python3 Control Demo 
-#
-# http://www.ryzerobotics.com/
-#
-# 1/1/2018
-
 import threading 
 import socket
 import sys
