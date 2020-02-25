@@ -3,11 +3,11 @@ import cv2
 import numpy as np
 
 
-######################################################################
-width = 640  # WIDTH OF THE IMAGE
-height = 480  # HEIGHT OF THE IMAGE
+
+width = 640  
+height = 480  
 deadZone =100
-######################################################################
+
 
 startCounter =0
 
@@ -26,7 +26,7 @@ print(me.get_battery())
 
 me.streamoff()
 me.streamon()
-######################## 
+ 
 
 frameWidth = width
 frameHeight = height
@@ -95,10 +95,9 @@ def getContours(img,imgContour):
             cv2.drawContours(imgContour, cnt, -1, (255, 0, 255), 7)
             peri = cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt, 0.02 * peri, True)
-            #print(len(approx))
             x , y , w, h = cv2.boundingRect(approx)
-            cx = int(x + (w / 2))  # CENTER X OF THE OBJECT
-            cy = int(y + (h / 2))  # CENTER X OF THE OBJECT
+            cx = int(x + (w / 2))  
+            cy = int(y + (h / 2))  
 
             if (cx <int(frameWidth/2)-deadZone):
                 cv2.putText(imgContour, " GO LEFT " , (20, 50), cv2.FONT_HERSHEY_COMPLEX,1,(0, 0, 255), 3)
@@ -165,7 +164,7 @@ while True:
     getContours(imgDil, imgContour)
     display(imgContour)
 
-    ################# FLIGHT
+   
     if startCounter == 0:
        me.takeoff()
        startCounter = 1
@@ -181,7 +180,7 @@ while True:
        me.up_down_velocity= -60
     else:
        me.left_right_velocity = 0; me.for_back_velocity = 0;me.up_down_velocity = 0; me.yaw_velocity = 0
-   # SEND VELOCITY VALUES TO TELLO
+
     if me.send_rc_control:
        me.send_rc_control(me.left_right_velocity, me.for_back_velocity, me.up_down_velocity, me.yaw_velocity)
     print(dir)
@@ -193,5 +192,5 @@ while True:
         me.land()
         break
 
-# cap.release()
+
 cv2.destroyAllWindows()
