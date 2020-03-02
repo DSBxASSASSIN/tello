@@ -2,12 +2,9 @@ from djitellopy import Tello
 import cv2
 import numpy as np
 
-
-
-width = 640  
-height = 480  
+width = 640
+height = 480
 deadZone = 100
-
 
 startCounter = 0
 
@@ -20,39 +17,33 @@ me.up_down_velocity = 0
 me.yaw_velocity = 0
 me.speed = 0
 
-
-
 print(me.get_battery())
 
 me.streamoff()
 me.streamon()
- 
 
 frameWidth = width
 frameHeight = height
 
+global imgContour 
 
-
-global imgContour
-global dir;
 def empty(a):
     pass
 
 cv2.namedWindow("HSV")
-cv2.resizeWindow("HSV", 640, 240)
-cv2.createTrackbar("HUE Min", "HSV", 10, 179, empty)
-cv2.createTrackbar("HUE Max", "HSV", 355, 179, empty)
-cv2.createTrackbar("SAT Min", "HSV", 148, 255, empty)
-cv2.createTrackbar("SAT Max", "HSV", 255, 255, empty)
-cv2.createTrackbar("VALUE Min", "HSV", 89, 255, empty)
-cv2.createTrackbar("VALUE Max", "HSV", 255, 255, empty)
+cv2.resizeWindow("HSV",640,240)
+cv2.createTrackbar("HUE Min","HSV",161,179,empty)
+cv2.createTrackbar("HUE Max","HSV",179,179,empty)
+cv2.createTrackbar("SAT Min","HSV",155,255,empty)
+cv2.createTrackbar("SAT Max","HSV",255,255,empty)
+cv2.createTrackbar("VALUE Min","HSV", 84,255,empty)
+cv2.createTrackbar("VALUE Max","HSV",255,255,empty)
 
 cv2.namedWindow("Parameters")
-cv2.resizeWindow("Parameters", 640, 240)
-cv2.createTrackbar("Threshold1", "Parameters", 166, 255, empty)
-cv2.createTrackbar("Threshold2", "Parameters", 171, 255, empty)
-cv2.createTrackbar("Area", "Parameters", 1750, 30000, empty)
-
+cv2.resizeWindow("Parameters",640,240)
+cv2.createTrackbar("Threshold1","Parameters",166,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",171,255,empty)
+cv2.createTrackbar("Area","Parameters",3750,30000,empty)
 
 def stackImages(scale,imgArray):
     rows = len(imgArray)
@@ -87,6 +78,7 @@ def stackImages(scale,imgArray):
 
 def getContours(img,imgContour):
     global dir
+
     contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     for cnt in contours:
         area = cv2.contourArea(cnt)
@@ -95,9 +87,10 @@ def getContours(img,imgContour):
             cv2.drawContours(imgContour, cnt, -1, (255, 0, 255), 7)
             peri = cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt, 0.02 * peri, True)
+            print(len(approx))
             x , y , w, h = cv2.boundingRect(approx)
-            cx = int(x + (w / 2))  
-            cy = int(y + (h / 2))  
+            cx = int(x + (w / 2))
+            cy = int(y + (h / 2))
 
             if (cx <int(frameWidth/2)-deadZone):
                 cv2.putText(imgContour, " GO LEFT " , (20, 50), cv2.FONT_HERSHEY_COMPLEX,1,(0, 0, 255), 3)
@@ -127,18 +120,18 @@ def getContours(img,imgContour):
 def display(img):
     cv2.line(img,(int(frameWidth/2)-deadZone,0),(int(frameWidth/2)-deadZone,frameHeight),(255,255,0),3)
     cv2.line(img,(int(frameWidth/2)+deadZone,0),(int(frameWidth/2)+deadZone,frameHeight),(255,255,0),3)
+
     cv2.circle(img,(int(frameWidth/2),int(frameHeight/2)),5,(0,0,255),5)
     cv2.line(img, (0,int(frameHeight / 2) - deadZone), (frameWidth,int(frameHeight / 2) - deadZone), (255, 255, 0), 3)
     cv2.line(img, (0, int(frameHeight / 2) + deadZone), (frameWidth, int(frameHeight / 2) + deadZone), (255, 255, 0), 3)
 
 while True:
 
-    # GET THE IMAGE FROM TELLO
     frame_read = me.get_frame_read()
     myFrame = frame_read.frame
     img = cv2.resize(myFrame, (width, height))
     imgContour = img.copy()
-    imgHsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    imgHsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
 
     h_min = cv2.getTrackbarPos("HUE Min","HSV")
     h_max = cv2.getTrackbarPos("HUE Max", "HSV")
@@ -146,7 +139,6 @@ while True:
     s_max = cv2.getTrackbarPos("SAT Max", "HSV")
     v_min = cv2.getTrackbarPos("VALUE Min", "HSV")
     v_max = cv2.getTrackbarPos("VALUE Max", "HSV")
-
 
     lower = np.array([h_min,s_min,v_min])
     upper = np.array([h_max,s_max,v_max])
@@ -164,33 +156,27 @@ while True:
     getContours(imgDil, imgContour)
     display(imgContour)
 
-   
     if startCounter == 0:
-       me.takeoff()
-       startCounter = 1
-
+        me.takeoff()
+        startCounter = 1
 
     if dir == 1:
-       me.yaw_velocity = -60
+        me.yaw_velocity = -60
     elif dir == 2:
-       me.yaw_velocity = 60
+        me.yaw_velocity = 60
     elif dir == 3:
-       me.up_down_velocity= 60
+        me.up_down_velocity = 60
     elif dir == 4:
-       me.up_down_velocity= -60
-    else:
-       me.left_right_velocity = 0; me.for_back_velocity = 0;me.up_down_velocity = 0; me.yaw_velocity = 0
+        me.up_down_velocity = -60
 
     if me.send_rc_control:
-       me.send_rc_control(me.left_right_velocity, me.for_back_velocity, me.up_down_velocity, me.yaw_velocity)
-    print(dir)
+        me.send_rc_control(me.left_right_velocity, me.for_back_velocity, me.up_down_velocity, me.yaw_velocity)
 
-    stack = stackImages(0.9, ([img, result], [imgDil, imgContour]))
+    stack = stackImages(0.7,([img,result],[imgDil,imgContour]))
     cv2.imshow('Horizontal Stacking', stack)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         me.land()
         break
-
 
 cv2.destroyAllWindows()
