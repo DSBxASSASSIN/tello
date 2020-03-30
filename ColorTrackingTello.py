@@ -30,6 +30,7 @@ global imgContour
 def empty(a):
     pass
 
+# COLOR SETTINGS WINDOW SETUP
 cv2.namedWindow("HSV")
 cv2.resizeWindow("HSV",640,240)
 cv2.createTrackbar("HUE Min","HSV",161,179,empty)
@@ -39,6 +40,7 @@ cv2.createTrackbar("SAT Max","HSV",255,255,empty)
 cv2.createTrackbar("VALUE Min","HSV", 84,255,empty)
 cv2.createTrackbar("VALUE Max","HSV",255,255,empty)
 
+# PARAMETERS SETTINGS WINDOW SETUP
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
 cv2.createTrackbar("Threshold1","Parameters",166,255,empty)
